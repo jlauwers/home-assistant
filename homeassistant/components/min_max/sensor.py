@@ -11,7 +11,6 @@ from homeassistant.const import (
     STATE_UNAVAILABLE,
     CONF_TYPE,
     ATTR_UNIT_OF_MEASUREMENT,
-    
 )
 from homeassistant.core import callback
 from homeassistant.helpers.entity import Entity
