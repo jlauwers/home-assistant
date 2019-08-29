@@ -23,6 +23,7 @@ ATTR_MAX_VALUE = "max_value"
 ATTR_COUNT_SENSORS = "count_sensors"
 ATTR_MEAN = "mean"
 ATTR_LAST = "last"
+ATTR_SUM = "sum"
 
 ATTR_TO_PROPERTY = [
     ATTR_COUNT_SENSORS,
@@ -30,6 +31,7 @@ ATTR_TO_PROPERTY = [
     ATTR_MEAN,
     ATTR_MIN_VALUE,
     ATTR_LAST,
+    ATTR_SUM,
 ]
 
 CONF_ENTITY_IDS = "entity_ids"
@@ -42,6 +44,7 @@ SENSOR_TYPES = {
     ATTR_MAX_VALUE: "max",
     ATTR_MEAN: "mean",
     ATTR_LAST: "last",
+    ATTR_SUM: "sum",
 }
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
@@ -102,6 +105,15 @@ def calc_mean(sensor_values, round_digits):
     return round(val / count, round_digits)
 
 
+def calc_sum(sensor_values, round_digits):                                                                                 
+    """Calculate max value, honoring unknown states."""                                                                    
+    val = 0                                                                                                                
+    for sval in sensor_values:                                                                                             
+        if sval != STATE_UNKNOWN:                                                                                          
+            val += sval                                                                                                    
+    return round(val, round_digits)      
+
+
 class MinMaxSensor(Entity):
     """Representation of a min/max sensor."""
 
@@ -120,7 +132,7 @@ class MinMaxSensor(Entity):
             ).capitalize()
         self._unit_of_measurement = None
         self._unit_of_measurement_mismatch = False
-        self.min_value = self.max_value = self.mean = self.last = None
+        self.min_value = self.max_value = self.mean = self.last = self.sum = None
         self.count_sensors = len(self._entity_ids)
         self.states = {}
 
@@ -207,3 +219,4 @@ class MinMaxSensor(Entity):
         self.min_value = calc_min(sensor_values)
         self.max_value = calc_max(sensor_values)
         self.mean = calc_mean(sensor_values, self._round_digits)
+        self.sum = calc_sum(sensor_values, self._round_digits) 
