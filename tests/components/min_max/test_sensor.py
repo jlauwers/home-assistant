@@ -26,7 +26,7 @@ class TestMinMaxSensor(unittest.TestCase):
         self.mean_1_digit = round(sum(self.values) / self.count, 1)
         self.mean_4_digits = round(sum(self.values) / self.count, 4)
         self.sum_1_digits = round(sum(self.values),1)
-        self.sum_4_digits = round(sum(self.values), 1)
+        self.sum_4_digits = round(sum(self.values), 4)
 
     def teardown_method(self, method):
         """Stop everything that was started."""
