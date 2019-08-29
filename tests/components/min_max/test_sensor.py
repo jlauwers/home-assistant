@@ -25,6 +25,8 @@ class TestMinMaxSensor(unittest.TestCase):
         self.mean = round(sum(self.values) / self.count, 2)
         self.mean_1_digit = round(sum(self.values) / self.count, 1)
         self.mean_4_digits = round(sum(self.values) / self.count, 4)
+        self.sum_1_digits = round(sum(self.values),1)
+        self.sum_4_digits = round(sum(self.values), 4)
 
     def teardown_method(self, method):
         """Stop everything that was started."""
@@ -266,3 +268,59 @@ class TestMinMaxSensor(unittest.TestCase):
         assert self.min == state.attributes.get("min_value")
         assert self.max == state.attributes.get("max_value")
         assert self.mean == state.attributes.get("mean")
+
+    def test_sum_sensor_1_digit(self):
+        """Test the sum sensor."""
+        config = {
+            "sensor": {
+                "platform": "min_max",
+                "name": "test_sum",
+                "type": "sum",
+                "round_digits": 1,
+                "entity_ids": ["sensor.test_1", "sensor.test_2", "sensor.test_3"],
+            }
+        }
+
+        assert setup_component(self.hass, "sensor", config)
+
+        entity_ids = config["sensor"]["entity_ids"]
+        state = self.hass.states.get("sensor.test_sum")
+
+        for entity_id, value in dict(zip(entity_ids, self.values)).items():
+            self.hass.states.set(entity_id, value)
+            self.hass.block_till_done()
+            state = self.hass.states.get("sensor.test_sum")
+            assert str(float(value)) == state.state
+
+        assert self.min == state.attributes.get("min_value")
+        assert self.max == state.attributes.get("max_value")
+        assert self.mean == state.attributes.get("mean")
+        assert str(float(self.sum_1_digits)) == state.attributes.get("sum")
+        
+    def test_sum_sensor_4_digit(self):
+        """Test the sum sensor."""
+        config = {
+            "sensor": {
+                "platform": "min_max",
+                "name": "test_sum",
+                "type": "sum",
+                "round_digits": 4,
+                "entity_ids": ["sensor.test_1", "sensor.test_2", "sensor.test_3"],
+            }
+        }
+
+        assert setup_component(self.hass, "sensor", config)
+
+        entity_ids = config["sensor"]["entity_ids"]
+        state = self.hass.states.get("sensor.test_sum")
+
+        for entity_id, value in dict(zip(entity_ids, self.values)).items():
+            self.hass.states.set(entity_id, value)
+            self.hass.block_till_done()
+            state = self.hass.states.get("sensor.test_sum")
+            assert str(float(value)) == state.state
+
+        assert self.min == state.attributes.get("min_value")
+        assert self.max == state.attributes.get("max_value")
+        assert self.mean == state.attributes.get("mean")
+        assert str(float(self.sum_4_digits)) == state.attributes.get("sum")
